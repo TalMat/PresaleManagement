@@ -1,0 +1,201 @@
+module.exports  = function(options){
+
+    let formClasses = '';
+
+    if(options.showValidation){
+        formClasses = 'was-validated';
+    }
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Girlscouts</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/order-page.css">
+</head>
+<body>
+
+<div class="banner-top">
+    <div>
+        <img src="../static/images/QSPGS_banner.png">
+    </div>
+</div>
+
+<div class="curtain">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" role="img" preserveAspectRatio="none" style="stroke-width: 0px;" fill="#ffffff">
+        <path d="M0 0v130l11.5 10 11.6-10 11.5 10 11.5-10 11.5 10L70 130l11.5 10 11.6-10 11.5 10 11.5-10 11.5 10 12.4-10V0H0z"></path>
+    
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 125.5 160.00001525878906" role="img" preserveAspectRatio="xMidYMid meet" style="stroke-width: 0px" fill="#ed1566" x="35%" y="-25%" width="30%">
+                <path d="M100.1 95.6c10.5-10.1 17-24.3 17-40C117.2 24.9 92.2 0 61.6 0S6 24.9 6 55.6C6 72 13.2 86.8 24.6 97L0 139.6l23.4 1.3 13.4 19 25.9-46.6 26 46.7 13.4-19 23.4-1.3-25.4-44.1zm-66.7 40.8l-3.9-6-8 .2 14-26c4.1 2.2 8.6 3.9 13.3 5l-15.4 26.8zm28.2-32.2C34.8 104.2 13 82.4 13 55.6S34.8 6.9 61.6 6.9s48.6 21.8 48.6 48.6c0 26.9-21.8 48.7-48.6 48.7zM96 130.3l-3.9 6-15.7-27.2c4.6-1.3 9-3.1 13.1-5.5l14.5 27-8-.3zM61.6 13.9c-23 0-41.7 18.7-41.7 41.7s18.7 41.7 41.7 41.7 41.7-18.7 41.7-41.7-18.7-41.7-41.7-41.7zm22.7 36.8L78.9 56c-2.2 2.1-3.6 6.3-3 9.4l1.3 7.4c.5 3-1.3 4.3-4 2.9l-6.7-3.5c-2.7-1.4-7.1-1.4-9.8 0L50 75.6c-2.7 1.4-4.5.1-4-2.9l1.3-7.4c.5-3-.9-7.2-3-9.4l-5.4-5.3c-2.2-2.1-1.5-4.2 1.5-4.7l7.5-1.1c3-.4 6.6-3 8-5.8l3.3-6.8c1.4-2.7 3.6-2.7 4.9 0l3.3 6.8c1.4 2.7 4.9 5.3 8 5.8l7.5 1.1c2.9.5 3.6 2.6 1.4 4.8z"></path>
+            </svg>
+            
+            <svg xmlns=http://www.w3.org/2000/svg" viewBox="0 0 450 120" preserveAspectRation=xMidYMid meet" style="stroke-width: 0px; font: sans-serif;" fill="#2EB557" x="10%" y="25%" width="138%">
+                <text y="0" x="1%">To redeem your Personalized T-shirt</text>
+                <text y="30">please complete the form below. You</text>
+                <text y="60" x="3%">will receive an email confirmation</text>
+                <text y="90"  x="15%">with order details.</text>
+            </svg>
+            
+        </svg>
+</div>
+
+<div class="container">
+    <div class="row ml-0 mb-3 bg-light mt-3 mr-0 rounded">
+
+
+        <!--Shirt Preview-->
+        <div class="col-md-4 col-sm-12 pl-0 mr-0 pr-0">
+            <div class="shirt-img-container">
+                <img id="shirt-front" src="/static/images/Front.png">
+            </div>
+            <div id="live-namedrop">
+                <div class="shirt-img-container">
+                    <img src="/static/images/Back.png">
+                </div>
+                <div id="shirt-namedrop-container">
+                    <span id="namedrop-span"></span>
+                </div>
+            </div>
+        </div>
+
+        <!--Form-->
+        <div class="row col-md-8 col-sm-12 mt-3 ml-0">
+            <form id="order-form" class="ml-3 mr-3 needs-validation ${ formClasses }" novalidate action="/api/order" method="post">
+
+                <div class="row mt-3 border-bottom border-primary">
+                    <h4 class="mb-3 ml-3">Tell us about your shirt</h4>
+                </div>
+
+                <div class="row mb-3 mt-3">
+
+                    <div class="col-md-6">
+                        <label for="namedrop">Personalized Name</label>
+                        <input id="namedrop" name="namedrop" class="form-control" maxlength="20" required>
+                        <div class="invalid-feedback">Please enter a custom name</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="size">Size</label>
+                        <select id="size" name="size" class="form-control" required></select>
+                        <div class="invalid-feedback">Please select a shirt size</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="code"><span>Redemption Code</span></label>
+                        <input id="code" name="code" class="form-control" required>
+                        <div class="invalid-feedback">${ options.codeError }</div>
+                    </div>
+                </div>
+
+                <!--Address label-->
+                <div class="row mt-5 border-bottom border-primary">
+                    <h4 class="mb-3 ml-3">Where should we send it?</h4>
+                </div>
+
+                <!--Address Block-->
+                <div class="row mt-3" id="address">
+
+                    <!--Address full name-->
+                    <div class="col-md-6 mb-3">
+                        <label for="name">Full Name</label>
+                        <input id="name" name="name" class="form-control" required>
+                        <div class="invalid-feedback">A name is required for shipping</div>
+                    </div>
+
+                    <!--Address row 1-->
+                    <div class="row col-md-12 pr-0 mb-3">
+
+                        <div class="col-md-6">
+                            <label for="address1">Address 1</label>
+                            <input id="address1" name="address_1" class="form-control" placeholder="500 Awesome Ave" required>
+                            <div class="invalid-feedback">A shipping address is required</div>
+                        </div>
+
+                        <div class="col-md-6 pr-0">
+                            <label for="address2">Address 2</label>
+                            <input id="address2" name="address_2" class="form-control" placeholder="Apt, Suite, Unit">
+                        </div>
+                    </div><!--END ADDRESS ROW 1-->
+
+                    <!--Address row 2-->
+                    <div class="row col-md-12 mb-3 pr-0">
+
+                        <div class="col-md-6">
+                            <label for="city">City</label>
+                            <input id="city" name="city" class="form-control" required>
+                            <div class="invalid-feedback">City is required for shipping</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="state">State</label>
+                            <select id="state" name="state" class="form-control" required></select>
+                            <div class="invalid-feedback">State is required for shipping</div>
+                        </div>
+
+                        <div class="col-md-3 pr-0">
+                            <label for="zipcode">Zip Code</label>
+                            <input id="zipcode" name="zip" class="form-control" required>
+                            <div class="invalid-feedback">Zip code is required for shipping</div>
+                        </div>
+                    </div><!--END ADDRESS ROW 2-->
+                </div><!--END ADDRESS BLOCK-->
+
+                <div class="row mt-5 border-bottom border-primary">
+                    <h4 class="mb-3 ml-3">We only use this for questions about your order</h4>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-6">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" class="form-control" required>
+                        <div class="invalid-feedback">Email is required for order confirmation</div>
+                    </div>
+
+                    <div class="col-md-6 mb-5">
+                        <label for="phone">Phone <span class="text-muted">(optional)</span></label>
+                        <input id="phone" name="phone" class="form-control">
+                    </div>
+                </div>
+
+                <button class="btn-block btn-lg bg-primary text-light mb-5">Send Me A Shirt!</button>
+        </form>
+        </div>
+    </div>
+    
+</div>
+    <div class="banner-bottom">
+        <span id="contact-us-text">
+            Contact Us
+        </span>
+
+        <div class="contact-phone">
+        <svg id="phone-svg" xmlns="http://www.w3.org/2000/svg" viewBox="-64.0054931640625 -351.92022705078125 135.92568969726562 136.02572631835938" role="img" preserveAspectRatio="xMidYMid meet" style="stroke-width: 0px;" fill="#ED1566">
+            <path d="M71.3-243.6l-.7-2c-1.6-4.8-6.9-9.7-11.7-11L41-261.5c-4.8-1.3-11.8.5-15.3 4l-6.5 6.5c-23.5-6.3-41.9-24.8-48.2-48.2l6.5-6.5c3.5-3.5 5.3-10.4 4-15.3l-4.9-17.9c-1.3-4.8-6.3-10.1-11-11.7l-2-.7c-4.8-1.6-11.6 0-15.1 3.6l-9.7 9.7c-1.7 1.7-2.8 6.6-2.8 6.7-.3 30.7 11.7 60.3 33.4 82 21.7 21.7 51.1 33.7 81.7 33.4.2 0 5.2-1.1 6.9-2.8l9.7-9.7c3.6-3.7 5.2-10.5 3.6-15.2z"></path>
+        </svg>
+        
+        <span>(877) 305-4146</span>
+        </div>
+          
+        <div class="contact-email">   
+        <svg id="email-svg" xmlns="http://www.w3.org/2000/svg" viewBox="28.68799591064453 50.34600067138672 143.6240234375 95.75000762939453" role="img" preserveAspectRatio="xMidYMid meet" style="stroke-width: 0px;" fill="#ED1566">
+            <path d="M100.491 100.909l71.821-33.113V53.338a2.99 2.99 0 0 0-2.992-2.992H31.68a2.99 2.99 0 0 0-2.992 2.992v14.681l71.803 32.89z"></path>
+            <path d="M101.754 106.923a2.987 2.987 0 0 1-1.251.275h-.006c-.415 0-.838-.087-1.245-.269L28.688 74.6v68.504a2.99 2.99 0 0 0 2.992 2.992h137.64a2.99 2.99 0 0 0 2.992-2.992V74.389l-70.558 32.534z"></path>
+        </svg>
+        
+        <span>customerservice@qspgao.com</span>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/populate-selectors.js"></script>
+    <script type="text/javascript" src="/static/js/live-namedrop.js"></script>
+    <script type="text/javascript" src="/static/js/order-validation.js"></script>
+</body>
+</html>
+    `
+};
+

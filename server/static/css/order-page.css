@@ -1,0 +1,130 @@
+@font-face {
+    font-family: HomesteadRegular;
+    src: url('../fonts/Homestead-Regular.ttf');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #00ae58;
+}
+
+#live-namedrop{
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.shirt-img-container {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.shirt-img-container img {
+    width: 100%;
+}
+
+#shirt-namedrop-container {
+    width: 35%;
+    position: relative;
+    top: -290px;
+    max-height: 36px;
+    z-index: 2;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#namedrop-span {
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    font-family: HomesteadRegular;
+    font-size: 24px;
+    height: 100%;
+    min-height: 36px;
+    display: inline-block;
+    white-space: nowrap;
+    color: #4a286d
+}
+
+.banner-top {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.banner-top div {
+    height: 90px;
+    max-width: 300px;
+    margin: auto;
+}
+
+.banner-top img {
+    padding-top: 5px;
+    width: 100%;
+}
+
+.ribbon {
+    width: 100px;
+    margin: 30px auto;
+}
+
+.curtain {
+    max-width: 520px;
+    margin: 0 auto;
+    font-family: Segoe UI;
+}
+
+.banner-bottom {
+    padding-left: 20px;
+    width: 100%;
+    height: 100px;
+    background-color: #fff;
+    display: flex;
+    font-family: Segoe UI;
+}
+
+#contact-us-text {
+    font-size: calc(42px + 1.3vw);
+    padding: 0 0 0 1vw;
+    flex: 0 1 32%;
+}
+
+#phone-svg {
+    height: 3vw;
+    min-height: 24px;
+    max-height: 52px;
+    padding-left: 1vw;
+}
+
+.contact-phone {
+    font-size: calc(18px + 0.5vw);
+    max-font-size: 26px;
+    padding-top: 1.7vw;
+    flex: 0 1 28%;
+}
+
+#email-svg {
+    height: 3vw;
+    min-height: 24px;
+    max-height: 52px;
+    padding-left: 1vw;
+}
+
+.contact-email {
+    font-size: calc(18px + 0.5vw);
+    max-font-size: 26px;
+    padding-top: 1.7vw;
+    flex: 0 1 40%;
+}
+
+@media(max-width: 1000px){
+    .banner-bottom {
+        height: 200px;
+        flex-direction: column;
+    }
+}
