@@ -11,6 +11,7 @@ let flash =          require('express-flash');
 
 let MONGO_URL = process.env.MONGO_URL;
 let SESSION_SECRET = process.env.SESSION_SECRET;
+// USER_CREATE_AUTH
 mongoose.Promise = global.Promise;
 
 app = express();
@@ -30,6 +31,10 @@ let store = new MongoDBStore( { uri: MONGO_URL, collection: 'sessions'}, functio
     }
 });
 
+// Putting static before sessions prevents
+// new sessions when serving static resources
+app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use('/app', express.static(path.join(__dirname, 'app')));
 
 app.use(session({
     secret: SESSION_SECRET,
@@ -37,7 +42,6 @@ app.use(session({
     saveUninitialized: true,
     store
 }));
-
 
 app.use( passport.initialize() );
 app.use( passport.session() );
@@ -47,28 +51,24 @@ app.use( bodyParser.json() );
 app.use( bodyParser.text() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 
-app.use('/static', express.static(path.join(__dirname, 'static')));
-app.use('/app', express.static(path.join(__dirname, 'app')));
-
 app.use('/api', require('./api/api.js'));
 app.use('/', require('./routes.js'));
 
 // 404 - catch and forward
-// app.use(function(req, res, next) {
-//     let err = new Error('Not Found');
-//     err.status = 404;
-//     next(err);
-// });
+app.use(function(req, res, next) {
+    let err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
-// app.use(function(err, req, res, next) {
-//     // set locals, only providing error in development
-//     res.locals.message = err.message;
-//     res.locals.error = req.app.get('env') === 'development' ? err : {};
-//
-//     // render the error page
-//     res.status(err.status || 500);
-//     res.send(err);
-//     // res.render('error');
-// });
+app.use(function(err, req, res) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+});
 
 module.exports = app;

@@ -142,7 +142,7 @@ function printNamedrops(orders){
 
 function printOrderPage(order) {
     report.addPage();
-    report.image('./static/images/noblewear.jpg', L_MARGIN, 50, {width: 150});
+    report.image('./static/images/noblewear.jpg', L_MARGIN, 50, { width: 150 });
 
     report.fontSize(16);
     report.text('Name Drop',  L_MARGIN,       150)

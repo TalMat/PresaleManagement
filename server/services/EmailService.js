@@ -1,4 +1,5 @@
 let nodemailer = require('nodemailer');
+let emailContent = require('../views/emails');
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -13,7 +14,24 @@ function sendConfirmationEmail(to){
         from: process.env.AUTO_EMAIL,
         to,
         subject: 'Order Confirmation',
-        html: '<h1>WOW IT REALLY WORKS</h1>'
+        html: emailContent.confirmation()
+    };
+
+    transporter.sendMail(mailOpt, (err, info) => {
+        if(err){
+            console.log(err);
+        } else {
+            console.log(info);
+        }
+    });
+}
+
+function sendShippedEmail(to){
+    const mailOpt = {
+        from: process.env.AUTO_EMAIL,
+        to,
+        subject: 'Order Shipped',
+        html: emailContent.shipment()
     };
 
     transporter.sendMail(mailOpt, (err, info) => {
@@ -26,5 +44,6 @@ function sendConfirmationEmail(to){
 }
 
 module.exports = {
-    sendConfirmationEmail
+    sendConfirmationEmail,
+    sendShippedEmail
 };

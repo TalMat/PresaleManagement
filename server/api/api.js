@@ -4,6 +4,9 @@ let inventory = require('./inventory');
 let reports =   require('./reports');
 let express =   require('express');
 let api =       express.Router();
+let passport =  require('passport');
+
+let User =      require('../models/user');
 
 // todo - name consistently
 
@@ -32,6 +35,16 @@ api.post('/generate',               auth, codes.generate);
 /*____ reports ____*/
 api.get('/reports',                 auth, reports.getAll);
 api.post('/report/download',        auth, reports.download);
+
+
+/*____ user ____*/
+api.post('/user', passport.authenticate('local-signup', {
+    successRedirect: '/portal',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+
 
 
 function auth(req, res, next){

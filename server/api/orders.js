@@ -1,6 +1,10 @@
+const { Crypt } = require('../services/EncryptionService');
+
 let Order =         require('../models/order');
 let Code =          require('../models/code');
 let reports =       require('./reports');
+
+let email =         require('../services/EmailService');
 
 // JS HTML templates
 let order_page =    require('../views/order-page');
@@ -65,7 +69,7 @@ exports.createOrder = (req, res) => {
         })
         .then(result => {
             console.log(result);
-            // email.sendConfirmationEmail('insomniautmusic@gmail.com');
+            email.sendConfirmationEmail(req.body.email);
             res.send(order_success({ name }));
         })
         .catch(err => {
@@ -148,6 +152,9 @@ exports.shipPrinted = (req, res) => {
     Order.find({ status: 'printing' })
         .then(results => {
             orders = results;
+            orders.forEach(o => {
+                email.sendShippedEmail(o.email);
+            })
         })
         .then(() => {
             return Order.updateMany(
