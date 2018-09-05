@@ -80,6 +80,8 @@ body {
 }
 
 .banner-bottom {
+    position: fixed;
+    bottom: 0px;
     padding-left: 20px;
     width: 100%;
     height: 100px;

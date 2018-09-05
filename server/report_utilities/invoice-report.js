@@ -3,10 +3,10 @@ let Pdf = require('pdfkit');
 let util = require('../util');
 
 const   L_MARGIN = 50,     X_LIGHT = '#ddd',    LIGHT = '#bbb',
-        MEDIUM = '#777',    DARK = '#000';
+    MEDIUM = '#777',    DARK = '#000';
 
 let     report,             line_location,      line_num,
-        page_num = 1;
+    page_num = 1;
 
 const SIZE_BLANK = {
     'y-xs': 0,      'y-s': 0,       'y-m': 0,       'y-l': 0,
@@ -84,50 +84,55 @@ function countSizes(orders){
 function generateReport(filename, orders){
 
     return new Promise((res, rej) => {
-        report = new Pdf;
-        addPageNum();
-        addInvoiceHeading();
-        printSizeCounts(orders);
 
-        line_location = 120;
-        line_num = 0;
+        if(orders.length > 0){
+            report = new Pdf;
+            addPageNum();
+            addInvoiceHeading();
+            printSizeCounts(orders);
 
-        orders.forEach(o => {
+            line_location = 120;
+            line_num = 0;
 
-            if(line_num >= 30){
-                report.addPage();
-                addPageNum();
-                addInvoiceHeading();
-                line_location = 120;
-                line_num = 0;
-            }
+            orders.forEach(o => {
 
-            // Shade every other line
-            if(line_num % 2 === 0){
-                report
-                    .lineJoin('square')
-                    .rect(L_MARGIN, line_location - 6, 520, 20)
-                    .fillColor(X_LIGHT)
-                    .fill();
-            }
+                if(line_num >= 30){
+                    report.addPage();
+                    addPageNum();
+                    addInvoiceHeading();
+                    line_location = 120;
+                    line_num = 0;
+                }
 
-            report.fillColor(DARK);
+                // Shade every other line
+                if(line_num % 2 === 0){
+                    report
+                        .lineJoin('square')
+                        .rect(L_MARGIN, line_location - 6, 520, 20)
+                        .fillColor(X_LIGHT)
+                        .fill();
+                }
 
-            report.text(o.namedrop, L_MARGIN + 3, line_location);
-            report.text(SIZE_MAP[o.size], L_MARGIN + 180, line_location);
-            report.text(o.code, L_MARGIN + 400, line_location);
-            line_location += 20;
-            line_num++;
-        });
+                report.fillColor(DARK);
 
-        let stream = fs.createWriteStream('./reports/' + filename + '.pdf');
-        report.pipe(stream);
+                report.text(o.namedrop, L_MARGIN + 3, line_location);
+                report.text(SIZE_MAP[o.size], L_MARGIN + 180, line_location);
+                report.text(o.code, L_MARGIN + 400, line_location);
+                line_location += 20;
+                line_num++;
+            });
 
-        report.end();
+            let stream = fs.createWriteStream('./reports/' + filename);
+            report.pipe(stream);
 
-        stream.on('finish', function () {
-            res(filename);
-        });
+            report.end();
+
+            stream.on('finish', function () {
+                res(filename);
+            });
+        } else {
+            rej('No shipped orders were found to invoice.')
+        }
     });
 }
 

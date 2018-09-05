@@ -1,4 +1,4 @@
-let crypto =        require('crypto');
+let crypto = require('crypto');
 
 class Crypt {
     constructor(key){

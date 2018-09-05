@@ -3,6 +3,7 @@ let Inventory =         require('../models/inventory');
 let util =              require('../util');
 let productionReport =  require('../report_utilities/production-report');
 let shippingReport =    require('../report_utilities/shipping-report');
+let invoiceReport =     require('../report_utilities/invoice-report');
 let fs =                require('fs');
 
 
@@ -51,7 +52,6 @@ exports.newProduction = (orders) => {
             filename: filename,
             report: newReport
         }
-            // report: reportData[1]._doc
     });
 };
 
@@ -75,7 +75,6 @@ exports.newShipment = (orders) => {
             filename: filename,
             report: newReport
         }
-            // report: reportData[1]._doc
     });
 };
 
@@ -91,21 +90,13 @@ exports.newInvoice = (orders) => {
 
     // Promises to create file and write to database
     let writeDatabase = Report.create(newReport);
-    // let createFile = generate.shippingReport(filename, orders);
-
-
-    let createFile = Promise.resolve(filename);
-    // Placeholder for invoice report generation Promise
-
-
-    // todo - generate invoice reports
+    let createFile = invoiceReport.generate(filename, orders);
 
     return Promise.all([createFile, writeDatabase]).then((reportData) => {
         return {
-            filename: createFile,
+            filename: filename,
             report: newReport
         };
-            report: reportData[1]._doc
     });
 };
 

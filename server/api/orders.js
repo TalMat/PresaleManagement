@@ -1,4 +1,5 @@
 const { Crypt } = require('../services/EncryptionService');
+let crypt = new Crypt(process.env.ENC_KEY);
 
 let Order =         require('../models/order');
 let Code =          require('../models/code');
@@ -11,12 +12,19 @@ let order_page =    require('../views/order-page');
 let order_success = require('../views/order-success');
 
 
+function decryptOrders(orders){
+    return orders.map(o => {
+        return o.decrypt();
+    });
+}
+
 exports.getAll = (req, res) => {
     console.log('GET /api/orders called...');
     Order.find({ 'status': { $ne: 'invoiced' }})
         .then( docs => {
             if(docs){
-                res.json(docs);
+
+                res.json(decryptOrders(docs));
             } else {
                 res.status(500);
                 res.send('Error: Could not retrieve documents...');
@@ -36,7 +44,6 @@ exports.createOrder = (req, res) => {
     Code.find({ code })
         .then(result => {
 
-            // todo - add views directory, middleware, etc
             if(!result[0]){
                 res.send(
                     order_page({
@@ -63,8 +70,6 @@ exports.createOrder = (req, res) => {
                 }
             });
 
-            // let order = makeOrder(req);
-            // return order.save()
             return makeOrder(req).save();
         })
         .then(result => {
@@ -88,7 +93,7 @@ exports.sinceDate = (req, res) => {
     console.log(since);
     Order.find( { date: { $gte: since } } )
         .then(orders => {
-            res.send(orders);
+            res.send(decryptOrders(orders));
         })
         .catch(err => {
             res.send(err);
@@ -129,7 +134,7 @@ exports.printNew = (req, res) => {
                 {runValidators: true})
         })
         .then(() => {
-            return reports.newProduction(orders);
+            return reports.newProduction(decryptOrders(orders));
         })
         .then(result => {
             res.json({
@@ -167,7 +172,7 @@ exports.shipPrinted = (req, res) => {
         })
         .then(result => {
             console.log(result);
-            return reports.newShipment(orders);
+            return reports.newShipment(decryptOrders(orders));
         })
         .then(result => {
             res.json({
@@ -201,7 +206,7 @@ exports.invoiceShipped = (req, res) => {
                 {runValidators: true})
         })
         .then(() => {
-            return reports.newInvoice(orders);
+            return reports.newInvoice(decryptOrders(orders));
         })
         .then(result => {
             res.json({

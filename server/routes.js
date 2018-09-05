@@ -36,7 +36,7 @@ router.get('/girlscouts', (req, res) => {
     res.send(order_page({ codeError: 'Redemption code is required', showValidation: false }))
 });
 
-router.get('/reports/:file', (req, res) => {
+router.get('/reports/:file', auth, (req, res) => {
     console.log(req.params.file);
     let filepath = __dirname + '/reports/' + req.params.file;
     console.log(filepath);

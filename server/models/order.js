@@ -1,6 +1,8 @@
 let mongoose = require('mongoose');
 let uniqueValidator = require('mongoose-unique-validator');
 let validator = require('mongoose-validator');
+let { Crypt } = require('../services/EncryptionService');
+let crypt = new Crypt(process.env.CRYPT_SECRET);
 
 const MAX_NAMEDROP_LEN = 22;
 const STATUS_LIST = [
@@ -78,7 +80,24 @@ let orderSchema = new mongoose.Schema({
     }
 });
 
-let Order = mongoose.model('Order', orderSchema);
 orderSchema.plugin(uniqueValidator);
 
+orderSchema.methods.decrypt = function(){
+    let decrypted = Object.assign(this);
+    decrypted.address[0] = crypt.decrypt(this.address[0]);
+    decrypted.address[1] = crypt.decrypt(this.address[1]);
+    if(decrypted.phone){ decrypted.phone = crypt.decrypt(this.phone); }
+    return decrypted;
+};
+
+orderSchema.pre('save', function(next){
+    this.address = [
+        crypt.encrypt(this.address[0]),
+        crypt.encrypt(this.address[1])
+    ];
+    if(this.phone){ this.phone = crypt.encrypt(this.phone); }
+    next();
+});
+
+let Order = mongoose.model('Order', orderSchema);
 module.exports = Order;

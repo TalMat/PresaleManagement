@@ -12,6 +12,9 @@ let flash =          require('express-flash');
 let MONGO_URL = process.env.MONGO_URL;
 let SESSION_SECRET = process.env.SESSION_SECRET;
 // USER_CREATE_AUTH
+// CRYPT_SECRET
+// AUTO_EMAIL
+// AUTO_PASS
 mongoose.Promise = global.Promise;
 
 app = express();

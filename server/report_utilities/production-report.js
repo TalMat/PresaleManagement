@@ -42,6 +42,7 @@ const TEST_NAMEDROPS = [
 function generateReport(filename, orders){
 
     return new Promise((res, rej) => {
+
         if(orders.length > 0){
             report = new Pdf;
             printSummaryCover(orders);
@@ -63,7 +64,7 @@ function generateReport(filename, orders){
                 res(filename);
             });
         } else {
-            rej('New orders were found.');
+            rej('No new orders were found to print.');
         }
     });
 
