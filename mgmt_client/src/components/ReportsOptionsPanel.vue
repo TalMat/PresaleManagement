@@ -1,6 +1,5 @@
 <template>
   <div class="options-panel">
-    Options go here
   </div>
 </template>
 

@@ -24,7 +24,7 @@ router.get('/', auth, (req, res) => {
 
 router.get('/portal', auth, function(req, res){
     console.log('Sending SPA to client...');
-    sendHTML(res, 'index');
+    sendHTML(res, 'cc_index');
 });
 
 router.get('/logout', (req, res) => {

@@ -41,7 +41,9 @@ export default({
   async invoiceShipped(context) {
     let res = await api().post('orders/invoice-shipped');
     if(res.data.success){
-      // todo - trigger download invoice report
+      // Download invoice report
+      console.log('Opening' + res.data.filename);
+      window.location.href = 'reports/' + res.data.filename;
 
       // Update the view
       context.commit( 'updateStatus',

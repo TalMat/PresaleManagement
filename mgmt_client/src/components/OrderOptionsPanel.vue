@@ -39,7 +39,7 @@
   </div>
 </template>
 
-c
+
 <script>
   import OrderService from '@/services/OrderService';
 
@@ -82,13 +82,5 @@ c
 
 <style lang="less">
   @import "../assets/global.less";
-
-  #status-select {
-    height: 135px;
-  }
-
-  #size-select {
-    height: 325px;
-  }
 
 </style>

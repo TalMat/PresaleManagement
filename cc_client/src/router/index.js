@@ -4,7 +4,6 @@ import Router from 'vue-router'
 import Portal from '@/components/Portal'
 
 
-
 Vue.use(Router);
 
 export default new Router({

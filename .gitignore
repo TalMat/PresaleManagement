@@ -1,0 +1,6 @@
+# Created by .ignore support plugin (hsz.mobi)
+server/reports
+server/node_modules
+mgmt_client/node_modules
+.idea
+test-scratch.js
