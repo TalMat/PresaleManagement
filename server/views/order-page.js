@@ -1,5 +1,7 @@
 module.exports  = function(options){
 
+    let redirectMessage = 'Please contact customer service to submit an order for a shirt using a 4-digit code. The contact information can be found at the bottom of the screen.'
+
     let formClasses = '';
 
     if(options.showValidation){
@@ -68,6 +70,8 @@ module.exports  = function(options){
                 <div class="row mt-3 border-bottom border-primary">
                     <h4 class="mb-3 ml-3">Tell us about your shirt</h4>
                 </div>
+
+                <div id="old-codes-redirect-message">${redirectMessage}</div>
 
                 <div class="row mb-3 mt-3">
 
@@ -190,10 +194,11 @@ module.exports  = function(options){
         </div>
     </div>
 
-    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/static/js/populate-selectors.js"></script>
-    <script type="text/javascript" src="/static/js/live-namedrop.js"></script>
-    <script type="text/javascript" src="/static/js/order-validation.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/populate-selectors.js"></script>
+    <script src="/static/js/live-namedrop.js"></script>
+    <script src="/static/js/order-validation.js"></script>
+    <script src="/static/js/old-codes-redirect.js"></script>
 </body>
 </html>
     `
