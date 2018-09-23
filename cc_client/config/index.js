@@ -41,9 +41,9 @@ module.exports = {
     index: path.resolve(__dirname, '../../server/static/cc_index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../../server'),
-    assetsSubDirectory: 'app',
-    assetsPublicPath: '/',
+    assetsRoot: path.resolve(__dirname, '../../server/app'),
+    assetsSubDirectory: 'cc',
+    assetsPublicPath: '/app',
 
     /**
      * Source Maps

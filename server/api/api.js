@@ -46,7 +46,6 @@ api.post('/user', passport.authenticate('local-signup', {
 
 
 
-
 function auth(req, res, next){
     if(req.isAuthenticated()){
         console.log('User is logged in');
