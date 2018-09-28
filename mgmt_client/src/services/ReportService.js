@@ -10,7 +10,7 @@ export default({
     if(res.data.success) {
       // Download printing report
       console.log('Opening ' + res.data.filename);
-      window.location.href = 'api/reports/' + res.data.filename;
+      window.location.href = '../api/reports/' + res.data.filename;
     } else {
       console.log(res.data.message);
     }

@@ -120,11 +120,6 @@ exports.download = (req, res) => {
                     console.log('error: ' + err);
                     res.json({ success: false, message: err })
                 } else {
-                    console.log('file: ');
-                    console.dir(stat);
-                    console.log('birthtime');
-                    console.log(stat.birthtime);
-
                     res.json({ success: true, filename: filename })
                 }
             });
@@ -132,7 +127,9 @@ exports.download = (req, res) => {
 };
 
 exports.file = (req, res) => {
-    let filepath = path.join(__dirname + '..//reports/' + req.params.file);
+
+    let filepath = path.join(__dirname, '../reports/', req.params.file);
+    console.log('GET /api/reports/' + req.params.file + ' called...');
     res.download(filepath);
 };
 

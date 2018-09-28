@@ -14,11 +14,15 @@ router.get('/', isUser, function(req, res){
 });
 
 function redirectByRole(req, res){
-        (req.user.local.role === 'manager' || 'admin') ?
-            res.redirect('/management/portal')
-            : (req.use.local.role === 'customercare') ?
-            res.redirect('/customercare/portal')
-            : sendHTML(res, 'login-page');
+
+    let role = req.user.local.role;
+    console.log(req.user.local.username + ' logged in | Role: ' + role);
+
+    (role === 'manager' || role === 'admin') ?
+        res.redirect('/management/portal')
+        : (role === 'customercare') ?
+        res.redirect('/customer-care/portal')
+        : sendHTML(res, 'login-page');
 }
 
 

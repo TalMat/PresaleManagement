@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let api = axios.create({ baseURL: '/api' });
+import api from '@/services/api';
 
 export default({
   async fetchOrders(context) {

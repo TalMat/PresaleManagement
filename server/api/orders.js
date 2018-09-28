@@ -19,7 +19,6 @@ function decryptOrders(orders){
 }
 
 exports.getAll = (req, res) => {
-    console.log('GET /api/orders called...');
     Order.find({ 'status': { $ne: 'invoiced' }})
         .then( docs => {
             if(docs){
@@ -36,7 +35,6 @@ exports.getAll = (req, res) => {
 };
 
 exports.createOrder = (req, res) => {
-    console.log('Attempting to create new order');
     let code = req.body.code;
     let name = req.body.name.split(' ')[0];
 
@@ -73,7 +71,6 @@ exports.createOrder = (req, res) => {
             return makeOrder(req).save();
         })
         .then(result => {
-            console.log(result);
             email.sendConfirmationEmail(req.body.email);
             res.send(order_success({ name }));
         })
@@ -90,7 +87,6 @@ exports.sinceDate = (req, res) => {
         res.json({ success: false, message: 'Date required for sinceDate'});
     }
 
-    console.log(since);
     Order.find( { date: { $gte: since } } )
         .then(orders => {
             res.send(decryptOrders(orders));
@@ -171,7 +167,6 @@ exports.shipPrinted = (req, res) => {
                 {runValidators: true})
         })
         .then(result => {
-            console.log(result);
             return reports.newShipment(decryptOrders(orders));
         })
         .then(result => {

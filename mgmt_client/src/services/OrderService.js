@@ -10,7 +10,8 @@ export default({
     if(res.data.success){
       // Download printing report
       console.log('Opening ' + res.data.filename);
-      window.location.href = 'api/reports/' + res.data.filename;
+      window.location.href = '../api/reports/' + res.data.filename;
+
       // Update the view
       context.commit('updateStatus',
         { oldStatus: 'new', newStatus: 'printing'});
@@ -27,7 +28,7 @@ export default({
     if(res.data.success){
       // Download shipping report
       console.log('Opening' + res.data.filename);
-      window.location.href = 'api/reports/' + res.data.filename;
+      window.location.href = '../api/reports/' + res.data.filename;
       // Update the view
       context.commit( 'updateStatus',
         { oldStatus: 'printing', newStatus: 'shipped' });
@@ -43,7 +44,7 @@ export default({
     if(res.data.success){
       // Download invoice report
       console.log('Opening' + res.data.filename);
-      window.location.href = 'api/reports/' + res.data.filename;
+      window.location.href = '../api/reports/' + res.data.filename;
 
       // Update the view
       context.commit( 'updateStatus',

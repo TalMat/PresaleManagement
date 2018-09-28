@@ -1,4 +1,4 @@
-import OrderService       from '../services/OrderService';
+import OrderService       from '@/services/OrderService';
 
 export default {
   ...OrderService
