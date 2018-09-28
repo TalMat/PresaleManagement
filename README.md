@@ -4,30 +4,25 @@
 
 ## Build & Setup
 
-From both __*cc_client*__ and __*mgmt_client*__ directories:
+From both the __*cc_client*__ and __*mgmt_client*__ directories:
 
-#### install dependencies
+#### client dependencies
 ``` 
 npm install
 ``` 
  
-#### build for production with minification or...
-``` 
-npm run build
-``` 
- 
-#### build for production and view the bundle analyzer report
-``` 
-npm run build --report
+#### server dependencies
+
+From the __*server*__ directory:
+
 ```
-
-#### install server dependencies
-
-From the server directory:
-
-``` 
 npm install
- ``` 
+ ```
+
+#### build for production
+```
+npm run build
+```
 
 #### set environment variables
 
@@ -40,6 +35,17 @@ CRYPT_SECRET | string used to encrypt and decrypt sensitive data
 AUTO_EMAIL | email used to send confirmation messages
 AUTO_PASS | password for AUTO_EMAIL account
 
+These can also be exported from a config.js file in the root directory.
+
+```
+module.exports = {
+    MONGO_URL:      'your_mongodb_url',
+    SESSION_SECRET: 'your_session_secret',
+    .
+    .
+    .
+}
+```
 
 ## Run
 #### nodemon
@@ -55,7 +61,7 @@ nodemon
 ``` 
  
 #### node
-From the server directory:
+From the __*server*__ directory:
 ``` 
-node ./bin/www
+npm run start
 ```
