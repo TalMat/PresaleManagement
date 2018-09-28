@@ -5,6 +5,7 @@ let productionReport =  require('../report_utilities/production-report');
 let shippingReport =    require('../report_utilities/shipping-report');
 let invoiceReport =     require('../report_utilities/invoice-report');
 let fs =                require('fs');
+let path =              require('path');
 
 
 exports.getAll = (req, res) => {
@@ -128,6 +129,11 @@ exports.download = (req, res) => {
                 }
             });
         });
+};
+
+exports.file = (req, res) => {
+    let filepath = path.join(__dirname + '..//reports/' + req.params.file);
+    res.download(filepath);
 };
 
 function describe(o){

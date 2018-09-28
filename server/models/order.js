@@ -1,8 +1,10 @@
-let mongoose = require('mongoose');
-let uniqueValidator = require('mongoose-unique-validator');
-let validator = require('mongoose-validator');
-let { Crypt } = require('../services/EncryptionService');
-let crypt = new Crypt(process.env.CRYPT_SECRET);
+let mongoose =          require('mongoose');
+let uniqueValidator =   require('mongoose-unique-validator');
+let validator =         require('mongoose-validator');
+let config =            require('../../config');
+let { Crypt } =         require('../services/EncryptionService');
+
+let crypt = new Crypt(config.CRYPT_SECRET || process.env.CRYPT_SECRET);
 
 const MAX_NAMEDROP_LEN = 22;
 const STATUS_LIST = [

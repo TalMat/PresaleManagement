@@ -30,22 +30,10 @@ export default {
   orderFilters(state) {
     return state.orderFilters;
   },
-  inventory(state) {
-    return state.inventory;
-  },
-  currentInventory(state){
-    return state.currentInventory;
-  },
   orderState(state, code){
     console.log(code);
     return state.orders.find(order => {
       return order.code === code
     });
-  },
-  presaleCodes(state){
-    return state.presales;
-  },
-  reports(state){
-    return state.reports;
   }
 }

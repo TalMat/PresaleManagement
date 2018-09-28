@@ -1,11 +1,5 @@
-import OrderService       from '@/services/OrderService';
-import InventoryService   from '@/services/InventoryService';
-import PresaleService     from '@/services/PresaleService';
-import ReportService      from '@/services/ReportService';
+import OrderService       from '../services/OrderService';
 
 export default {
-  ...OrderService,
-  ...InventoryService,
-  ...PresaleService,
-  ...ReportService
+  ...OrderService
 }

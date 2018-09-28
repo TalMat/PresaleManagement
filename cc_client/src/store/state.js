@@ -6,9 +6,5 @@ export default {
     size: [],
     name: '',
     code: ''
-  },
-  inventory: [],
-  currentInventory: {},
-  presales: [],
-  reports: []
+  }
 }

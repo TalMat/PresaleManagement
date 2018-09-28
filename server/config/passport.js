@@ -4,8 +4,6 @@ let User = require('../models/user');
 
 module.exports = function(passport) {
 
-    // todo - add strategy for
-
     passport.serializeUser(function(user, done){
         done(null, user.id);
     });

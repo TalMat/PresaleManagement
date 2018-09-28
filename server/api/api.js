@@ -9,6 +9,7 @@ let passport =  require('passport');
 let User =      require('../models/user');
 
 // todo - name consistently
+// todo - reorganize by service
 
 /*____ orders ____*/
 api.get('/orders',                  auth, orders.getAll);
@@ -35,6 +36,7 @@ api.post('/generate',               auth, codes.generate);
 /*____ reports ____*/
 api.get('/reports',                 auth, reports.getAll);
 api.post('/report/download',        auth, reports.download);
+api.get('/reports/:file',           auth, reports.file);
 
 
 /*____ user ____*/

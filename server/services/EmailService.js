@@ -1,11 +1,12 @@
 let nodemailer = require('nodemailer');
 let emailContent = require('../views/emails');
+let config = require('../../config');
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.AUTO_EMAIL,
-        pass: process.env.AUTO_PASS
+        user: config.AUTO_EMAIL || process.env.AUTO_EMAIL,
+        pass: config.AUTO_PASS || process.env.AUTO_PASS
     }
 });
 
