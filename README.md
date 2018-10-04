@@ -35,10 +35,10 @@ CRYPT_SECRET | string used to encrypt and decrypt sensitive data
 AUTO_EMAIL | email used to send confirmation messages
 AUTO_PASS | password for AUTO_EMAIL account
 
-These can also be exported from a config.js file in the root directory.
+These can also be exported from a config.json file in the root directory.
 
 ```
-module.exports = {
+{
     MONGO_URL:      'your_mongodb_url',
     SESSION_SECRET: 'your_session_secret',
     .
