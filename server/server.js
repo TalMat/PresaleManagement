@@ -8,10 +8,22 @@ let passportConfig =    require('./config/passport')(passport);
 let session =           require('express-session');
 let MongoDBStore =      require('connect-mongodb-session')(session);
 let flash =             require('express-flash');
+let fs =                require('fs');
 
-let config =            require('../config');
-let MONGO_URL = config.MONGO_URL || process.env.MONGO_URL;
-let SESSION_SECRET = config.SESSION_SECRET || process.env.SESSION_SECRET;
+let configPath = path.join(__dirname, '../config.json');
+fs.existsSync(configPath)
+    ? setEnvVarsFromFile(configPath)
+    : console.log(`No config file. Configuring ${__filename} with env vars.`);
+
+function setEnvVarsFromFile(filepath){
+    let config = JSON.parse(fs.readFileSync(filepath));
+    Object.keys(config).forEach(key => {
+        process.env[key] = config[key];
+    });
+}
+
+let MONGO_URL = process.env.MONGO_URL;
+let SESSION_SECRET = process.env.SESSION_SECRET;
 
 mongoose.Promise = global.Promise;
 
@@ -25,13 +37,6 @@ mongoose.connect(MONGO_URL)
         console.log('Error connecting to MongoDB using Mongoose...');
         console.log(err);
     });
-
-// let store = new MongoDBStore( { uri: MONGO_URL, collection: 'sessions'}, function(err){
-//     if(err){
-//         console.log('Error, cannot connect to MongoDB to store sessions', err);
-//     }
-// });
-
 
 // JS HTML template
 let order_page = require('./views/order-page');

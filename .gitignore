@@ -3,5 +3,4 @@ server/reports
 server/node_modules
 mgmt_client/node_modules
 .idea
-test-scratch.js
-config.js
+config.json

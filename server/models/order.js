@@ -1,10 +1,16 @@
 let mongoose =          require('mongoose');
 let uniqueValidator =   require('mongoose-unique-validator');
 let validator =         require('mongoose-validator');
-let config =            require('../../config');
-let { Crypt } =         require('../services/EncryptionService');
+let fs =                require('fs');
+let path = require('path');
 
-let crypt = new Crypt(config.CRYPT_SECRET || process.env.CRYPT_SECRET);
+let configPath = path.join(__dirname, '../../config.json');
+let config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath))
+    : console.log(`No config file. Configuring ${__filename} with env vars.`);
+
+
+let { Crypt } =         require('../services/EncryptionService');
+let crypt = new Crypt(process.env.CRYPT_SECRET);
 
 const MAX_NAMEDROP_LEN = 22;
 const STATUS_LIST = [
