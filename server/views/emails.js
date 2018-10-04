@@ -12,7 +12,7 @@ function confirmation(){
         <!DOCTYPE html>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">` +
         emailHead +
-        emailBody("You've done GREAT!", "Your shirt will ship in two weeks!") +
+        emailBody("You've done GREAT!", "Your shirt will ship in four to six weeks!") +
         `</html>`;
 }
 
