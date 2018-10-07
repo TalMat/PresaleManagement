@@ -1,12 +1,6 @@
 let mongoose =          require('mongoose');
 let uniqueValidator =   require('mongoose-unique-validator');
 let validator =         require('mongoose-validator');
-let fs =                require('fs');
-let path = require('path');
-
-let configPath = path.join(__dirname, '../../config.json');
-let config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath))
-    : console.log(`No config file. Configuring ${__filename} with env vars.`);
 
 
 let { Crypt } =         require('../services/EncryptionService');

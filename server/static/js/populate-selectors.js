@@ -11,8 +11,9 @@
 
 
     var sizes = {
-        Youth: ['XS', 'S', 'M', 'L', 'XL'],
-        Adult: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
+        Youth: ['Youth XS', 'Youth S', 'Youth M', 'Youth L', 'Youth XL'],
+        Adult: ['Adult XS', 'Adult S', 'Adult M', 'Adult L', 'Adult XL',
+                'Adult 2XL', 'Adult 3XL', 'Adult 4XL', 'Adult 5XL']
     };
 
     function populateStates(){

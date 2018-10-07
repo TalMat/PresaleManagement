@@ -7,6 +7,9 @@
 @primary-background: #5578a2;
 @background-dark: #416385;
 
+@options-secondary: #ddd;
+@options-primary: #333;
+
 body {
   padding: 0;
   margin: 0;
@@ -88,7 +91,7 @@ body {
   height: 100%;
   width: 100%;
   max-width: 300px;
-  background-color: #666;
+  background-color: #999;
   margin: 0;
   padding: 10px 0 0;
   box-sizing: border-box;
@@ -119,14 +122,10 @@ body {
   display: block;
   margin: 0 5px 10px;
   padding: 5px;
-  background-color: #333;
-  color: #ddd;
+  background-color: @options-primary;
+  color: @options-secondary;
   box-sizing: border-box;
-  label {
-    float: left;
-    padding-left: 2px;
-    font-size: 1.2em;
-  }
+
   input, select {
     display: block;
     border-radius: 3px;
@@ -138,6 +137,36 @@ body {
   }
 }
 
+.options-checkbox-filter {
+  display: block;
+  margin: 0 5px 10px;
+  padding: 5px;
+  background-color: @options-primary;
+  color: #000;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.filter-label {
+  width: 100%;
+  text-align: left;
+
+  label {
+    padding: 0 0 5px 2px;
+    font-size: 1.2em;
+    color: @options-secondary;
+  }
+}
+
+.checkboxes:nth-child(2n){
+  background-color: #fff;
+  border-radius: 3px;
+  border: 1px solid gray;
+}
+
+.checkboxes div:nth-child(2n-1) {
+  background-color: #eee;
+}
 
 .data-container {
   width: 100%;

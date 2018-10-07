@@ -1,13 +1,6 @@
 let nodemailer = require('nodemailer');
 let emailContent = require('../views/emails');
 
-let fs = require('fs');
-let path = require('path');
-
-let configPath = path.join(__dirname, '../../config.json');
-let config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath))
-    : console.log(`No config file. Configuring ${__filename} with env vars.`);
-
 let AUTO_EMAIL = process.env.AUTO_EMAIL;
 let AUTO_PASS = process.env.AUTO_PASS;
 

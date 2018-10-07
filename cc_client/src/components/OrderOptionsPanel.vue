@@ -2,32 +2,56 @@
   <div class="options-panel">
 
     <ul>
-      <li id="status-filter" class="options-filter">
-        <label for="status-select">Status</label><br>
-        <select id="status-select" v-model="filter.status" multiple>
-          <option v-for="status in statuses">{{status}}</option>
-        </select>
+      <li id="status-filter" class="options-checkbox-filter">
+        <div class="filter-label">
+          <label>Status</label>
+        </div>
+
+
+        <!--<select id="status-select" v-model="filter.status" multiple>-->
+          <!--<option v-for="status in statuses">{{status}}</option>-->
+        <!--</select>-->
+
+        <div class="checkboxes">
+          <div v-for="status in statuses">
+            <input type="checkbox" :id="status" :value="status" v-model="filter.status">
+            <label :for="status">{{status}}</label>
+          </div>
+        </div>
+
+
       </li>
 
       <li id="namedrop-filter" class="options-filter">
-        <label>Namedrop</label><br>
+        <div class="filter-label">
+          <label>Namedrop</label>
+        </div>
         <input v-model="filter.namedrop">
       </li>
 
-      <li id="size-filter" class="options-filter">
-        <label for="size-select">Size</label><br>
-        <select id="size-select" v-model="filter.size" multiple>
-          <option v-for="size in sizeMap">{{size}}</option>
-        </select>
+      <li id="size-filter" class="options-checkbox-filter">
+        <div class="filter-label">
+          <label>Size</label>
+        </div>
+        <div class="checkboxes">
+          <div v-for="(size, sizeKey) in sizeMap">
+            <input type="checkbox" :id="sizeKey" :value="size" v-model="filter.size">
+            <label :for="sizeKey">{{size}}</label>
+          </div>
+        </div>
       </li>
 
       <li id="name-filter" class="options-filter">
-        <label>Customer Name</label><br>
+        <div class="filter-label">
+          <label>Customer Name</label>
+        </div>
         <input v-model="filter.name">
       </li>
 
       <li id="id-filter" class="options-filter">
-        <label>Code / ID</label><br>
+        <div class="filter-label">
+          <label>Code / ID</label>
+        </div>
         <input v-model="filter.code">
       </li>
     </ul>
@@ -58,6 +82,7 @@
     methods: {},
     computed: {
       filter() {
+        console.log(this.$store.getters.orderFilters);
         return this.$store.getters.orderFilters;
       }
     }

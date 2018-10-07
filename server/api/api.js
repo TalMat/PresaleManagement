@@ -6,13 +6,6 @@ let express =   require('express');
 let api =       express.Router();
 let passport =  require('passport');
 
-let fs = require('fs');
-let path = require('path');
-
-let configPath = path.join(__dirname, '../../config.json');
-let config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath))
-    : console.log(`No config file. Configuring ${__filename} with env vars.`);
-
 let USER_CREATE_AUTH = process.env.USER_CREATE_AUTH;
 
 let User =      require('../models/user');
