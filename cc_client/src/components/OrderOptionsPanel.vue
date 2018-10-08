@@ -7,11 +7,6 @@
           <label>Status</label>
         </div>
 
-
-        <!--<select id="status-select" v-model="filter.status" multiple>-->
-          <!--<option v-for="status in statuses">{{status}}</option>-->
-        <!--</select>-->
-
         <div class="checkboxes">
           <div v-for="status in statuses">
             <input type="checkbox" :id="status" :value="status" v-model="filter.status">

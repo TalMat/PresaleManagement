@@ -12,7 +12,7 @@
 
     var sizes = {
         Youth: ['Youth XS', 'Youth S', 'Youth M', 'Youth L', 'Youth XL'],
-        Adult: ['Adult XS', 'Adult S', 'Adult M', 'Adult L', 'Adult XL',
+        Adult: ['Adult S', 'Adult M', 'Adult L', 'Adult XL',
                 'Adult 2XL', 'Adult 3XL', 'Adult 4XL', 'Adult 5XL']
     };
 

@@ -29,7 +29,7 @@ mongoose.Promise = global.Promise;
 
 app = express();
 
-mongoose.connect(MONGO_URL)
+mongoose.connect(MONGO_URL, { useNewUrlParser: true })
     .then( () => {
         console.log('Connected to MongoDB using Mongoose.')
     })

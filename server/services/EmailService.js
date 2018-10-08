@@ -22,8 +22,10 @@ function sendConfirmationEmail(to){
 
     transporter.sendMail(mailOpt, (err, info) => {
         if(err){
+            console.log("Confirmation email Error:");
             console.log(err);
         } else {
+            console.log("Confirmation email Success:");
             console.log(info);
         }
     });
@@ -39,8 +41,10 @@ function sendShippedEmail(to){
 
     transporter.sendMail(mailOpt, (err, info) => {
         if(err){
+            console.log("Shipping email Error:");
             console.log(err);
         } else {
+            console.log("Shipping email Success:");
             console.log(info);
         }
     });
