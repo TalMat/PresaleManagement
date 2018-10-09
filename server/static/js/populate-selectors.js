@@ -16,6 +16,14 @@
                 'Adult 2XL', 'Adult 3XL', 'Adult 4XL', 'Adult 5XL']
     };
 
+    let sizeMap = {
+        'Youth XS': 'xs',   'Youth S': 's',     'Youth M': 'm',
+        'Youth L': 'l',     'Youth XL': 'xl',   'Adult S': 's',
+        'Adult M': 'm',     'Adult L': 'l',     'Adult XL': 'xl',
+        'Adult 2XL': '2xl', 'Adult 3XL': '3xl', 'Adult 4XL': '4xl',
+        'Adult 5XL': '5xl'
+    };
+
     function populateStates(){
         var selector = document.getElementById('state');
 
@@ -43,7 +51,7 @@
             for(var size of Object.values(sizes[group])){
                 // console.log(size);
                 var opt = document.createElement('option');
-                opt.value = (group.slice(0, 1) + '-' + size).toLowerCase();
+                opt.value = (group.slice(0, 1) + '-' + sizeMap[size]).toLowerCase();
                 opt.innerHTML = size;
                 category.appendChild(opt);
             }

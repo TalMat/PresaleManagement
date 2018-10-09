@@ -1,14 +1,14 @@
-let orders =    require('./orders');
-let codes =     require('./presales');
-let inventory = require('./inventory');
-let reports =   require('./reports');
+let orders =    require('./services/orders/routes');
+let codes =     require('./services/presales/routes');
+let inventory = require('./services/inventory/routes');
+let reports =   require('./services/reporting/routes');
 let express =   require('express');
 let api =       express.Router();
 let passport =  require('passport');
 
 let USER_CREATE_AUTH = process.env.USER_CREATE_AUTH;
 
-let User =      require('../models/user');
+let User =      require('./models/user');
 
 // todo - name consistently
 // todo - reorganize by service
@@ -56,7 +56,7 @@ function auth(req, res, next){
     if(req.isAuthenticated()){
         next();
     } else {
-        console.log('User is NOT logged in');
+        console.log(`Unauthorized: Redirecting user from ${req.originalUrl} to /login`);
         res.redirect('/login');
     }
 }
@@ -65,7 +65,6 @@ function requireMgmt(req, res, next){
     if(req.user){
 
         let role = req.user.local.role;
-        console.log(req.user.local.username + ' is logged in | Role: ' + role);
 
         (role === 'manager' || role === 'admin')
             ? next()
@@ -74,7 +73,7 @@ function requireMgmt(req, res, next){
 }
 
 function userCreateAuth(req, res, next){
-    req.body.userCreateAuth === USER_CREATE_AUTH
+    req.body.userCreateAuth === process.env.USER_CREATE_AUTH
         ? next()
         : res.redirect('/');
 }

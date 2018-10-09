@@ -9,7 +9,8 @@ let transporter = nodemailer.createTransport({
     auth: {
         user: AUTO_EMAIL,
         pass: AUTO_PASS
-    }
+    },
+    secure: false
 });
 
 function sendConfirmationEmail(to){

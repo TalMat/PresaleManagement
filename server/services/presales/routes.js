@@ -1,6 +1,6 @@
-let Code =          require('../models/code');
-let presaleReport = require('../report_utilities/presale-report');
-let util =          require('../util');
+let Code =          require('./model');
+let presaleReport = require('../reporting/generators/presale-report');
+let util =          require('../reporting/formatter');
 
 const CODE_LENGTH = 8;
 const MAX_CODE_GEN = 5000;
@@ -29,19 +29,15 @@ exports.getAll = (req, res) => {
 
 exports.check = (req,res) => {
     let code = req.body.code;
-    console.log('Check code ' + code + ' for validity...');
 
     // Check database for submitted code
     Code.find({ code })
         .then(result => {
             if(!result[0]){
-                console.log('Returning false');
                 res.json({ valid: false });
             } else if(result[0].available){
-                console.log('Returning result: { valid: true }');
                 res.json({ valid: true })
             } else if(result) {
-                console.log('Returning false');
                 res.json({ valid: false, message: 'That code has already been redeemed'});
             }
         })
@@ -50,8 +46,6 @@ exports.check = (req,res) => {
 exports.generate = (req, res) => {
     let qty = req.body.qty;
     let batch = req.body.batch;
-
-    console.log(req.body);
 
     if(qty < 0 && qty > MAX_CODE_GEN) {
         res.json({
@@ -82,7 +76,8 @@ exports.generate = (req, res) => {
             // result[1] : report generation
         })
         .catch(err => {
-            console.log('error: ' + err);
+            console.log(`Error generating codes:`);
+            console.log(err);
             res.json({ success: false, message: err });
         });
 };

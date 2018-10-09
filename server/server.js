@@ -9,6 +9,7 @@ let session =           require('express-session');
 let MongoDBStore =      require('connect-mongodb-session')(session);
 let flash =             require('express-flash');
 let fs =                require('fs');
+let nte =               require('./native-template-engine');
 
 let configPath = path.join(__dirname, '../config.json');
 fs.existsSync(configPath)
@@ -29,7 +30,7 @@ mongoose.Promise = global.Promise;
 
 app = express();
 
-mongoose.connect(MONGO_URL, { useNewUrlParser: true })
+mongoose.connect(MONGO_URL)
     .then( () => {
         console.log('Connected to MongoDB using Mongoose.')
     })
@@ -38,10 +39,21 @@ mongoose.connect(MONGO_URL, { useNewUrlParser: true })
         console.log(err);
     });
 
+app.engine('html', nte);
+app.set('views', './views');
+app.set('view engine', 'html');
+
 // JS HTML template
-let order_page = require('./views/order-page');
 app.use('/girlscouts', (req, res) => {
-    res.send(order_page({ codeError: 'Redemption code is required', showValidation: false }))
+    res.render('order-page', {
+        codeError: 'Redemption code is required',
+        showValidation: false,
+        formClasses: '',
+        redirectMessage:
+            'Please contact customer service to submit an order for a shirt ' +
+            'using a 4-digit code. The contact information can be found at ' +
+            'the bottom of the screen.'
+    })
 });
 
 // Putting static before sessions prevents
@@ -73,7 +85,7 @@ app.use( bodyParser.json() );
 app.use( bodyParser.text() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 
-app.use('/api', require('./api/api.js'));
+app.use('/api', require('./api.js'));
 app.use('/', require('./routes.js'));
 
 // 404 - catch and forward

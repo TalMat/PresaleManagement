@@ -21,6 +21,8 @@ module.exports = function(passport) {
         passReqToCallback: true
     }, function(req, username, password, role, done){
 
+        console.log(`User created: ${username} | Role: ${role}`);
+
         //Once the current event loop turn runs to completion, call the callback function.
         process.nextTick(function(){
 

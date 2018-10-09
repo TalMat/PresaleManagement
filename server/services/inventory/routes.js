@@ -1,4 +1,4 @@
-let Inventory = require('../models/inventory');
+let Inventory = require('./model');
 
 exports.getAll = (req, res) => {
     Inventory.find()
@@ -12,8 +12,8 @@ exports.getAll = (req, res) => {
             ]);
         })
         .then(data => {
-            console.log(data[0]);
-            console.log(data[1]);
+            // console.log(data[0]);
+            // console.log(data[1]);
             return Object.assign(data[0], { current: data[1] });
         })
         .then(data => {
@@ -21,6 +21,7 @@ exports.getAll = (req, res) => {
             res.json(data);
         })
         .catch(err => {
+            console.log(`Error retrieving inventory:`);
             console.log(err);
             res.json({ success: false, message: err })
         })
@@ -38,7 +39,6 @@ exports.newItem = (req, res) => {
 
     item.save()
         .then(result => {
-            console.log(result);
             return updateCurrent();
         })
         .then(current => {
@@ -50,6 +50,7 @@ exports.newItem = (req, res) => {
             });
         })
         .catch(err => {
+            console.log(`Error saving inventory item:`);
             console.log(err);
         });
 };
@@ -64,8 +65,6 @@ exports.deleteItem = (req, res) => {
             return updateCurrent();
         })
         .then(current => {
-            console.log(current);
-
             res.json({
                 success: true,
                 message: 'Inventory item deleted',
@@ -74,6 +73,7 @@ exports.deleteItem = (req, res) => {
             });
         })
         .catch(err => {
+            console.log(`Error deleting inventory item:`);
             console.log(err);
         });
 };
@@ -92,10 +92,12 @@ function updateCurrent(){
     return Inventory.findOne({ kind: 'update' }, {}, {sort: {date: -1}})
     // Find only the most recent 'update'
         .then(newestUpdate => {
-            currentInv.counts = newestUpdate.counts;
+            if(newestUpdate){
+                currentInv.counts = newestUpdate.counts;
 
-            return Inventory.find({ date: { $gt: newestUpdate.date }});
-            // Find all orders newer than most recent update
+                // Find all orders newer than most recent update
+                return Inventory.find({ date: { $gt: newestUpdate.date }});
+            }
         })
         .then(sinceUpdate => {
             if(sinceUpdate){
@@ -122,9 +124,9 @@ function updateCurrent(){
             // console.dir(currentInv);
             return currentInv;
         })
-        // .catch(err => {
-        //     console.log('Error... ' + err);
-        // });
+    // .catch(err => {
+    //     console.log('Error... ' + err);
+    // });
 }
 
 function transformInventory(startItem, accuItems){

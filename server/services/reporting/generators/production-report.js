@@ -1,6 +1,6 @@
 let fs = require('fs');
 let Pdf = require('pdfkit');
-let util = require('../util');
+let util = require('../formatter');
 
 let report;
 const L_MARGIN = 50;
@@ -17,27 +17,6 @@ const SIZE_MAP = {
     'a-2xl': 'Adult 2XL',   'a-3xl': 'Adult 3XL',   'a-4xl': 'Adult 4XL',
     'a-5xl': 'Adult 5XL'
 };
-const TEST_NAMEDROPS = [
-    'COOKIES R GREAT', 'SALLY', 'PIZZAFACE', 'RADDAD', 'DYLAN K',
-    'I LOVE MY TROOP', 'TO THE MOON', 'TROOP 8558', 'TROOP 8558',
-    'TROOP 48458', 'TROOP 8558', 'JILLIAN', 'SARAH', 'SPIDERWOMAN',
-    'GIRLSCOUTS ROCK', 'BILLY JO', 'ABSOLUTE LONGEST NAME', 'DONNY',
-    'TONS OF NAMES', '~~RAD LYFE!~~', 'MOAR NAMEZ', 'OUT OF IDEAS',
-    'I LIKE DOGS', 'CATS ARE OKAY', 'CUSTOM NAMES', 'CUSTOM NAMES',
-    'IT JUST CONTINUES', 'TESTING A LOT', 'JACKIE', 'BRITTANY', 'JVNNY',
-    'COOL NAME DUDE', 'CHRIS', 'JAKE', 'JOE', 'I LOVE MY PARENTS', 'JESUS',
-    'FAITH', 'INFINITY', 'COOKIES', 'RANDOM NAMES', 'RANDOM IDEAS',
-    'SELL THEM COOKIES', 'JUST KEEP SWIMMING', 'PARTICIPATION AWARD',
-    'CATS R DOGS', 'NAMEDROPPP', 'NAMEDROP', 'SARAH', 'NO DUPLICATES',
-    'HERE IS A SHIRT', 'BE COOL KIDDO', 'TIME FOR COOKIES', 'GRLSCTZ',
-    'AAAAAA', 'BBBBBBB', 'CCCCCC', 'DDD', 'DDDDD', 'CCCCCCCCCC', 'ZZZZZZZ',
-    'XXXXXXXXX', 'YYYYY', '000', '9999999', '666666666', '88888', '77777',
-    '5555555', '44444444', '3333333', '22222222', '1111111111', '000000',
-    'DARREN', 'ZACHARY', 'GIRLNAMES', 'BOYZ R GIRLZ TOO', 'TEST WRAP',
-    'BOBBY', 'SANDRA', 'SANDY', 'SANDALS', 'SANDFACE', 'SANDCOOKIES',
-    'SANTANA', 'SANTARIA', 'CRYSTAL BALL', 'GOOD VIBES', 'SEBIV DOOG',
-    'DOGGO LUVR'
-];
 
 function generateReport(filename, orders){
 

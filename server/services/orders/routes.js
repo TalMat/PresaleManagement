@@ -1,16 +1,11 @@
-const { Crypt } = require('../services/EncryptionService');
+const { Crypt } = require('../EncryptionService');
 let crypt = new Crypt(process.env.ENC_KEY);
-
-let Order =         require('../models/order');
-let Code =          require('../models/code');
-let reports =       require('./reports');
-
-let email =         require('../services/EmailService');
-
-// JS HTML templates
-let order_page =    require('../views/order-page');
-let order_success = require('../views/order-success');
-
+let Order =         require('./model');
+let Code =          require('../presales/model');
+let reports =       require('../reporting/routes');
+let email =         require('../EmailService');
+let moment =        require('moment');
+let dateFormat = 'MM.DD.YY h:mmA';
 
 function decryptOrders(orders){
     return orders.map(o => {
@@ -30,6 +25,7 @@ exports.getAll = (req, res) => {
             }
         })
         .catch(err => {
+            console.log(`Error retrieving orders:`);
             console.log(err);
         })
 };
@@ -37,45 +33,42 @@ exports.getAll = (req, res) => {
 exports.createOrder = (req, res) => {
     let code = req.body.code;
     let name = req.body.name.split(' ')[0];
+    console.log(`Email received: ${req.body.email}`);
 
-    // Check database for submitted code
-    Code.find({ code })
+    Code.findOneAndUpdate({ code: code }, { "available": false })
         .then(result => {
+            if(result && result.available){
+                return Promise.resolve();
+            } else {
 
-            if(!result[0]){
-                res.send(
-                    order_page({
-                        codeError: 'That code is not valid',
-                        showValidation: true
-                    }))
-
-            } else if(result[0].available){
-                return result[0];
-
-            } else if(result) {
-                res.send(
-                    order_page({
-                        codeError: 'That code has already been redeemed',
-                        showValidation: true
-                    }));
+                return result ?
+                    Promise.reject({ code: 1, message: 'Code was already redeemed'})
+                    : Promise.reject({ code: 1, message: 'Please enter a valid code'});
             }
         })
-        .then(code => {
-            code.set({available: false});
-            code.save( (err, updated) => {
-                if(err){
-                    res.json({ success: false, message: err });
-                }
-            });
-
-            return makeOrder(req).save();
+        .then(() => {
+            return makeOrder(req);
         })
-        .then(result => {
+        .then(() => {
             email.sendConfirmationEmail(req.body.email);
-            res.send(order_success({ name }));
+            res.render('order-success', { name: name })
         })
         .catch(err => {
-            console.log('Error: ' + err);
+            err.code === 1 ?
+                res.render('order_page', {
+                    codeError: err.message,
+                    showValidation: true,
+                    redirectMessage:
+                    'Please contact customer service to submit an order for a shirt ' +
+                    'using a 4-digit code. The contact information can be found at ' +
+                    'the bottom of the screen.'
+                })
+                : res.render('404', {
+                    error: err
+                });
+
+            console.log(`Error: ${err.message ? err.message : err}`);
+            console.log(`Code: ${code} | Email: ${req.body.email} | ${moment().format(dateFormat)}`);
         })
 };
 
@@ -108,6 +101,7 @@ exports.updateStatus = (req, res) => {
             res.json({ success: true, message: result.n + ' order(s) updated'});
         })
         .catch(err => {
+            console.log(`Error updating order status:`);
             console.log(err);
             res.json({ success: false, message: 'Problem updating orders'});
         })
@@ -229,7 +223,7 @@ function makeOrder(req){
             req.body.address_1, req.body.address_2,
             req.body.city, req.body.state, req.body.zip ),
         phone: req.body.phone
-    });
+    }).save();
 }
 
 function concatAddress(address_1, address_2, city, state, zip){

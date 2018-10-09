@@ -38,7 +38,7 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../../server/static/mgmt_index.html'),
+    index: path.resolve(__dirname, '../../server/views/mgmt-index.html'),
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../../server/app'),

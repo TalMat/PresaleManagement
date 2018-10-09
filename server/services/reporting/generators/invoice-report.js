@@ -1,6 +1,6 @@
 let fs = require('fs');
 let Pdf = require('pdfkit');
-let util = require('../util');
+let util = require('../formatter');
 
 const   L_MARGIN = 50,     X_LIGHT = '#ddd',    LIGHT = '#bbb',
     MEDIUM = '#777',    DARK = '#000';

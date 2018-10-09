@@ -35,7 +35,7 @@ CRYPT_SECRET | string used to encrypt and decrypt sensitive data
 AUTO_EMAIL | email used to send confirmation messages
 AUTO_PASS | password for AUTO_EMAIL account
 
-These can also be exported from a config.json file in the root directory.
+These can also be placed in a config.json file in the root directory.
 
 ```
 {

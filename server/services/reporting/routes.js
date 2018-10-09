@@ -1,12 +1,39 @@
-let Report =            require('../models/report');
-let Inventory =         require('../models/inventory');
-let util =              require('../util');
-let productionReport =  require('../report_utilities/production-report');
-let shippingReport =    require('../report_utilities/shipping-report');
-let invoiceReport =     require('../report_utilities/invoice-report');
+let Report =            require('./model');
+let Inventory =         require('../inventory/model');
+let util =              require('./formatter');
+let productionReport =  require('./generators/production-report');
+let shippingReport =    require('./generators/shipping-report');
+let invoiceReport =     require('./generators/invoice-report');
 let fs =                require('fs');
 let path =              require('path');
 
+let mongoose =          require('mongoose');
+let Grid = require('gridfs-stream');
+let GridFS;
+
+let MONGO_URL = process.env.MONGO_URL;
+
+mongoose.Promise = global.Promise;
+
+mongoose.connect(MONGO_URL)
+    .then( () => {
+        console.log('Connected to MongoDB using Mongoose. (reporting/routes)')
+        GridFS = Grid(mongoose.connection.db, mongoose.mongo);
+    })
+    .catch( err => {
+        console.log('Error connecting to MongoDB using Mongoose... (reporting/routes)');
+        console.log(err);
+    });
+
+function writeFile(path, name, callback){
+    let writeStream = GridFS.createWriteStream({
+        filename: name
+    });
+    writeStream.on('close', (file) => {
+        callback(null, file);
+    });
+    fs.createReadStream(path).pipe(writeStream);
+}
 
 exports.getAll = (req, res) => {
     Report.find()
@@ -30,7 +57,14 @@ exports.newProduction = (orders) => {
 
     // Promises to create file and write to database
     let writeDatabase = Report.create(newReport);
-    let createFile = productionReport.generate(filename, orders);
+    let createFile = productionReport.generate(filename, orders)
+        .then(filename => {
+            console.log(`Production report filename: ${filename}`);
+        })
+        .catch(err => {
+            console.log(`Error generating new production report.`);
+            console.log(err);
+        });
 
     let counts = orders.reduce(function(res, o){
         if(res[o.size] !== undefined){
@@ -48,7 +82,6 @@ exports.newProduction = (orders) => {
     });
 
     return Promise.all([createFile, writeDatabase, inventoryUpdate]).then((reportData) => {
-        console.log('inventory update, report generation, and report db write complete...');
         return {
             filename: filename,
             report: newReport
@@ -71,7 +104,6 @@ exports.newShipment = (orders) => {
     let createFile = shippingReport.generate(filename, orders);
 
     return Promise.all([createFile, writeDatabase]).then((reportData) => {
-        console.log('report generation, and report db write complete...');
         return {
             filename: filename,
             report: newReport
@@ -116,8 +148,8 @@ exports.download = (req, res) => {
 
             fs.stat('./reports/' + filename, (err, stat) => {
                 if(err){
-                    // todo - regenerate file if !exists in /reports
-                    console.log('error: ' + err);
+                    console.log(`Error loading report file:`);
+                    console.log(err);
                     res.json({ success: false, message: err })
                 } else {
                     res.json({ success: true, filename: filename })
@@ -128,8 +160,7 @@ exports.download = (req, res) => {
 
 exports.file = (req, res) => {
 
-    let filepath = path.join(__dirname, '../reports/', req.params.file);
-    console.log('GET /api/reports/' + req.params.file + ' called...');
+    let filepath = path.join(__dirname, '../../reports/', req.params.file);
     res.download(filepath);
 };
 
