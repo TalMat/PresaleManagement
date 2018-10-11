@@ -5,6 +5,8 @@ import api from '@/services/api';
 export default({
   async fetchOrders(context) {
     let res = await api().get('orders');
-    context.commit('initOrders', res.data);
+    res.data.success
+      ? context.commit('initOrders', res.data.orders)
+      : console.log(res.data.message);
   }
 })

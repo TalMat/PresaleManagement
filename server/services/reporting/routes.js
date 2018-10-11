@@ -1,79 +1,97 @@
 let Report =            require('./model');
 let Inventory =         require('../inventory/model');
-let util =              require('./formatter');
 let productionReport =  require('./generators/production-report');
 let shippingReport =    require('./generators/shipping-report');
 let invoiceReport =     require('./generators/invoice-report');
 let fs =                require('fs');
 let path =              require('path');
-
 let mongoose =          require('mongoose');
-let Grid = require('gridfs-stream');
-let GridFS;
+let moment =            require('moment');
 
 let MONGO_URL = process.env.MONGO_URL;
 
-mongoose.Promise = global.Promise;
+let dateFormat = 'MM.DD.YY h:mmA';
+let filenameFormat = 'YYYY-MM-DD';
 
+let contentTypes = {
+    pdf: 'application/pdf',
+    csv: 'text/csv'
+};
+
+let Grid = require('gridfs-stream');
+let GridFS;
+
+mongoose.Promise = global.Promise;
 mongoose.connect(MONGO_URL)
-    .then( () => {
-        console.log('Connected to MongoDB using Mongoose. (reporting/routes)')
+    .then(() => {
+        console.log('Connected to MongoDB using Mongoose. (reporting/routes)');
         GridFS = Grid(mongoose.connection.db, mongoose.mongo);
     })
-    .catch( err => {
+    .catch(err => {
         console.log('Error connecting to MongoDB using Mongoose... (reporting/routes)');
         console.log(err);
     });
 
-function writeFile(path, name, callback){
-    let writeStream = GridFS.createWriteStream({
-        filename: name
-    });
-    writeStream.on('close', (file) => {
-        callback(null, file);
-    });
-    fs.createReadStream(path).pipe(writeStream);
-}
-
-exports.getAll = (req, res) => {
-    Report.find()
-        .then(reports => {
-            res.json({ success: true, data: reports });
-        })
-        .catch(err => {
-            res.json({ sucess: false, message: err });
-        })
-};
-
-exports.newProduction = (orders) => {
-    let filename = 'production_' + util.date() + '.pdf';
-    let newReport = {
-        kind: 'production',
+function makeReportMetadata(orders, filename, kind){
+    return {
+        kind: kind,
         filename: filename,
         description: describe(orders),
         order_codes: orders.map(o => o.code),
         date: Date.now() // Date is returned client for sorting
     };
+}
 
-    // Promises to create file and write to database
-    let writeDatabase = Report.create(newReport);
-    let createFile = productionReport.generate(filename, orders)
-        .then(filename => {
-            console.log(`Production report filename: ${filename}`);
-        })
-        .catch(err => {
-            console.log(`Error generating new production report.`);
-            console.log(err);
-        });
+function saveReportFile(orders, filename, reportKind){
 
-    let counts = orders.reduce(function(res, o){
-        if(res[o.size] !== undefined){
-            res[o.size]++;
-        } else {
-            res[o.size] = 1;
-        }
+    let metadata = makeReportMetadata(orders, filename, reportKind);
+
+    let writeStream = GridFS.createWriteStream({
+        filename: filename.split('.')[0],
+        metadata: metadata
+    });
+
+    writeStream.on('close', file => {
+        // todo - remove file from local storage
+        return Promise.resolve(metadata);
+    });
+
+    writeStream.on('error', err => {
+        return Promise.reject(err);
+    });
+
+    fs.createReadStream(path.join(__dirname, '../../reports', filename))
+        .pipe(writeStream);
+}
+
+function getMapOfCounts(orders){
+    return orders.reduce(function(res, o){
+        (res[o.size] !== undefined) // size is in map
+            ? res[o.size]++         // count size or
+            : res[o.size] = 1;      // initialize size
         return res;
     }, {});
+}
+
+exports.getAll = (req, res) => {
+
+    GridFS.files.find().toArray()
+        .then(data => {
+            res.json({
+                success: true,
+                data: data.map(data => data.metadata)
+            });
+        })
+        .catch(err => res.json({ sucess: false, message: err }))
+};
+
+exports.newProduction = (orders) => {
+    let filename = `production_${moment().format(filenameFormat)}.pdf`;
+
+    let metadata = productionReport.generate(filename, orders)
+        .then(filename => saveReportFile(orders, filename, 'production'));
+
+    let counts = getMapOfCounts(orders);
 
     let inventoryUpdate = Inventory.create({
         kind: 'production',
@@ -81,87 +99,79 @@ exports.newProduction = (orders) => {
         counts
     });
 
-    return Promise.all([createFile, writeDatabase, inventoryUpdate]).then((reportData) => {
+    return Promise.all([metadata, inventoryUpdate]).then((reportData) => {
         return {
             filename: filename,
-            report: newReport
+            report: metadata
         }
     });
 };
 
 exports.newShipment = (orders) => {
-    let filename = 'shipping_' + util.date() + '.csv';
-    let newReport = {
-        kind: 'shipping',
-        filename: filename,
-        description: describe(orders),
-        order_codes: orders.map(o => o.code),
-        date: Date.now() // Date is returned client for sorting
-    };
+    let filename = `shipping_${moment().format(filenameFormat)}.csv`;
 
-    // Promises to create file and write to database
-    let writeDatabase = Report.create(newReport);
-    let createFile = shippingReport.generate(filename, orders);
-
-    return Promise.all([createFile, writeDatabase]).then((reportData) => {
-        return {
-            filename: filename,
-            report: newReport
-        }
-    });
+    return shippingReport.generate(filename, orders)
+        .then(filename => saveReportFile(orders, filename, 'shipping'))
+        .then(metadata => {
+            return {
+                filename: filename,
+                report: metadata
+            }
+        });
 };
 
 exports.newInvoice = (orders) => {
-    let filename = 'invoice_' + util.date() + '.pdf';
-    let newReport = {
-        kind: 'invoice',
-        filename: filename,
-        description: describe(orders),
-        order_codes: orders.map(o => o.code),
-        date: Date.now() // Date is returned client for sorting
-    };
+    let filename = `invoice_${moment().format(filenameFormat)}.pdf`;
 
-    // Promises to create file and write to database
-    let writeDatabase = Report.create(newReport);
-    let createFile = invoiceReport.generate(filename, orders);
-
-    return Promise.all([createFile, writeDatabase]).then((reportData) => {
-        return {
-            filename: filename,
-            report: newReport
-        };
-    });
-};
-
-exports.newGeneral = () => {
-
-};
-
-exports.newPresale = () => {
-
+    return invoiceReport.generate(filename, orders)
+        .then(filename => saveReportFile(orders, filename, 'invoice'))
+        .then(metadata => {
+            return {
+                filename: filename,
+                report: metadata
+            }
+        });
 };
 
 exports.download = (req, res) => {
-    Report.findOne({_id: req.body.id})
-        .then(report => {
-            let filename = report.filename;
 
-            fs.stat('./reports/' + filename, (err, stat) => {
-                if(err){
-                    console.log(`Error loading report file:`);
-                    console.log(err);
-                    res.json({ success: false, message: err })
-                } else {
-                    res.json({ success: true, filename: filename })
-                }
+    let [filename, extention] = req.body.filename.split('.');
+
+    GridFS.files.find({filename: filename}).toArray()
+        .then(data => {
+            if(!data[0]) return Promise.reject(`File ${filename} does not exist`);
+            res.writeHead(200, {
+                'Content-Type': contentTypes[extention],
+                'Content-Length': data[0].length
             });
+            let readStream = GridFS.createReadStream({filename: filename});
+            readStream.pipe(res);
+        })
+        .catch(err => {
+            res.render('404', {error: err });
+            console.log(`${err} | User: ${req.user.local.username} | ${moment().format(dateFormat)}`);
         });
+
 };
 
 exports.file = (req, res) => {
 
-    let filepath = path.join(__dirname, '../../reports/', req.params.file);
-    res.download(filepath);
+    let [filename, extention] = req.params.file.split('.');
+
+    GridFS.files.find({filename: filename}).toArray()
+        .then(data => {
+            if(!data[0]) return Promise.reject(`File ${filename} does not exist`);
+            res.writeHead(200, {
+                'Content-Type': contentTypes[extention],
+                'Content-Length': data[0].length
+            });
+            let readStream = GridFS.createReadStream({filename: filename});
+            readStream.pipe(res);
+        })
+        .catch(err => {
+            res.render('404', {error: err });
+            console.log(`${err} | User: ${req.user.local.username} | ${moment().format(dateFormat)}`);
+        });
 };
 
 function describe(o){

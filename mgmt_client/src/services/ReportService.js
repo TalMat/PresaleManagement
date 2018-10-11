@@ -5,14 +5,7 @@ export default({
     let res = await api().get('reports');
     context.commit('initReports', res.data.data);
   },
-  async downloadReport(id){
-    let res = await api().post('report/download', {id});
-    if(res.data.success) {
-      // Download printing report
-      console.log('Opening ' + res.data.filename);
-      window.location.href = '../api/reports/' + res.data.filename;
-    } else {
-      console.log(res.data.message);
-    }
+  downloadReport(filename){
+    window.open('../api/reports/' + filename);
   }
 })

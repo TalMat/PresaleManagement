@@ -31,10 +31,10 @@ mongoose.Promise = global.Promise;
 app = express();
 
 mongoose.connect(MONGO_URL)
-    .then( () => {
+    .then(() => {
         console.log('Connected to MongoDB using Mongoose.')
     })
-    .catch( err => {
+    .catch(err => {
         console.log('Error connecting to MongoDB using Mongoose...');
         console.log(err);
     });
@@ -48,11 +48,7 @@ app.use('/girlscouts', (req, res) => {
     res.render('order-page', {
         codeError: 'Redemption code is required',
         showValidation: false,
-        formClasses: '',
-        redirectMessage:
-            'Please contact customer service to submit an order for a shirt ' +
-            'using a 4-digit code. The contact information can be found at ' +
-            'the bottom of the screen.'
+        formClasses: ''
     })
 });
 
@@ -89,8 +85,9 @@ app.use('/api', require('./api.js'));
 app.use('/', require('./routes.js'));
 
 // 404 - catch and forward
-app.use((req, res) => {
-    res.send('<h1>Error: Page does not exist.</h1><h3>Are you trying to <a href="/">Log In</a>?</h3>');
+app.use((err, req, res, next) => {
+    console.log(err);
+    res.render('404', { error: err });
 });
 
 module.exports = app;

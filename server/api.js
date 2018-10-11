@@ -10,9 +10,6 @@ let USER_CREATE_AUTH = process.env.USER_CREATE_AUTH;
 
 let User =      require('./models/user');
 
-// todo - name consistently
-// todo - reorganize by service
-
 /*____ orders ____*/
 api.get('/orders',                  auth, orders.getAll);
 api.post('/orders',                 auth, orders.sinceDate);
@@ -57,7 +54,7 @@ function auth(req, res, next){
         next();
     } else {
         console.log(`Unauthorized: Redirecting user from ${req.originalUrl} to /login`);
-        res.redirect('/login');
+        res.redirect('/');
     }
 }
 

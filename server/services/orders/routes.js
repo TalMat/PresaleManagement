@@ -16,16 +16,11 @@ function decryptOrders(orders){
 exports.getAll = (req, res) => {
     Order.find({ 'status': { $ne: 'invoiced' }})
         .then( docs => {
-            if(docs){
-
-                res.json(decryptOrders(docs));
-            } else {
-                res.status(500);
-                res.send('Error: Could not retrieve documents...');
-            }
+            if(docs) res.json({success: true, orders: decryptOrders(docs)});
         })
         .catch(err => {
-            console.log(`Error retrieving orders:`);
+            res.json({success: false, message: 'Retrieving orders from database failed.'});
+            console.log(`Error: retrieving orders from database failed | ${moment().format(dateFormat)}`);
             console.log(err);
         })
 };
@@ -33,14 +28,12 @@ exports.getAll = (req, res) => {
 exports.createOrder = (req, res) => {
     let code = req.body.code;
     let name = req.body.name.split(' ')[0];
-    console.log(`Email received: ${req.body.email}`);
 
     Code.findOneAndUpdate({ code: code }, { "available": false })
         .then(result => {
             if(result && result.available){
                 return Promise.resolve();
             } else {
-
                 return result ?
                     Promise.reject({ code: 1, message: 'Code was already redeemed'})
                     : Promise.reject({ code: 1, message: 'Please enter a valid code'});
@@ -57,11 +50,7 @@ exports.createOrder = (req, res) => {
             err.code === 1 ?
                 res.render('order_page', {
                     codeError: err.message,
-                    showValidation: true,
-                    redirectMessage:
-                    'Please contact customer service to submit an order for a shirt ' +
-                    'using a 4-digit code. The contact information can be found at ' +
-                    'the bottom of the screen.'
+                    showValidation: true
                 })
                 : res.render('404', {
                     error: err

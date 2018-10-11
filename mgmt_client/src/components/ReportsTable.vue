@@ -67,7 +67,7 @@
       },
       download(report){
         console.log('Downloading report: ' + report.description + ' | ' + report.kind + ' | ' + report.date);
-        ReportService.downloadReport(report._id);
+        ReportService.downloadReport(report.filename);
       }
     },
     computed: {
