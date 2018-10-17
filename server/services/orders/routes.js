@@ -26,38 +26,49 @@ exports.getAll = (req, res) => {
 };
 
 exports.createOrder = (req, res) => {
-    let code = req.body.code;
-    let name = req.body.name.split(' ')[0];
+    // runs when user submits a new order
+    let code = req.body.code.toUpperCase();
 
-    Code.findOneAndUpdate({ code: code }, { "available": false })
+    Code.findOneAndUpdate({ code: code }, { "available": false }, {upsert: false})
         .then(result => {
-            if(result && result.available){
-                return Promise.resolve();
-            } else {
-                return result ?
-                    Promise.reject({ code: 1, message: 'Code was already redeemed'})
-                    : Promise.reject({ code: 1, message: 'Please enter a valid code'});
+
+            if(!result){
+                return Promise.reject({
+                    appError: true,
+                    message: 'Please enter a valid code'
+                });
+            }
+
+            if(result && !result.available){
+                return Promise.reject({
+                    appError: true,
+                    message: 'That code was already redeemed'
+                });
             }
         })
         .then(() => {
-            return makeOrder(req);
-        })
-        .then(() => {
+            makeOrder(req);
+            console.log(`Order created | Code: ${code} | Namedrop: ${req.body.namedrop} | Size: ${req.body.size} | ${moment().format(dateFormat)}`);
             email.sendConfirmationEmail(req.body.email);
-            res.render('order-success', { name: name })
+            res.status(303);
+            res.redirect('/order-success');
+            // res.render('order-success', { name: name })
         })
         .catch(err => {
-            err.code === 1 ?
-                res.render('order_page', {
+            if(err.appError) {
+                res.render('order-page', {
                     codeError: err.message,
-                    showValidation: true
-                })
-                : res.render('404', {
+                    formClasses: 'was-validated'
+                });
+                console.log(`Error creating order: ${err.message} | Code: ${code} | Email: ${req.body.email} | ${moment().format(dateFormat)}`);
+            } else {
+                res.render('404', {
                     error: err
                 });
 
-            console.log(`Error: ${err.message ? err.message : err}`);
-            console.log(`Code: ${code} | Email: ${req.body.email} | ${moment().format(dateFormat)}`);
+                console.log(`Error creating order: application error | Code: ${code} | Email: ${req.body.email} | ${moment().format(dateFormat)}`);
+                console.log(err);
+            }
         })
 };
 
@@ -96,39 +107,30 @@ exports.updateStatus = (req, res) => {
         })
 };
 
-exports.printNew = (req, res) => {
-    let orders;
+exports.printNew = (async (req, res) => {
 
-    Order.find({ status:  'new' })
-        .then(results => {
-            orders = results;
-        })
-        .then(() => {
-            return Order.updateMany(
-                { status: 'new' },
-                { $set: {
-                    status: 'printing',
-                    'history.printing': Date.now()
-                }},
-                {runValidators: true})
-        })
-        .then(() => {
-            return reports.newProduction(decryptOrders(orders));
-        })
-        .then(result => {
-            res.json({
-                filename: result.filename,
-                report: result.report,
-                success: true
-            });
-        })
-        .catch( err => {
-            res.json({
-                success: false,
-                message: err
-            })
+    try {
+
+        let orders = await Order.find({status: "new"});
+        let reportData = await reports.newProduction(decryptOrders(orders));
+        await Order.updateMany(
+            { status: 'new' },
+            { $set: {
+                status: 'printing',
+                'history.printing': Date.now()
+            }},
+            {runValidators: true}
+        );
+        console.log(reportData);
+        res.json({
+            filename: reportData.filename,
+            report: reportData.report,
+            success: true
         });
-};
+    } catch(e) {
+        console.log(`Error: ${e}`);
+    }
+});
 
 exports.shipPrinted = (req, res) => {
     let orders;

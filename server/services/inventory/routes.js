@@ -1,4 +1,6 @@
 let Inventory = require('./model');
+let moment = require('moment');
+let dateFormat = 'MM.DD.YY h:mmA';
 
 exports.getAll = (req, res) => {
     Inventory.find()
@@ -17,11 +19,10 @@ exports.getAll = (req, res) => {
             return Object.assign(data[0], { current: data[1] });
         })
         .then(data => {
-            // console.log(data);
             res.json(data);
         })
         .catch(err => {
-            console.log(`Error retrieving inventory:`);
+            console.log(`Error retrieving inventory | ${moment().format('MM.DD.YY h:mmA')}`);
             console.log(err);
             res.json({ success: false, message: err })
         })
@@ -50,7 +51,7 @@ exports.newItem = (req, res) => {
             });
         })
         .catch(err => {
-            console.log(`Error saving inventory item:`);
+            console.log(`Error saving inventory item | ${moment().format('MM.DD.YY h:mmA')}`);
             console.log(err);
         });
 };
@@ -73,7 +74,7 @@ exports.deleteItem = (req, res) => {
             });
         })
         .catch(err => {
-            console.log(`Error deleting inventory item:`);
+            console.log(`Error deleting inventory item | ${moment().format(dateFormat)}`);
             console.log(err);
         });
 };
@@ -111,22 +112,24 @@ function updateCurrent(){
             }
         })
         .then(currentInventory => {
-            return Inventory.findOneAndUpdate(
-                { kind: 'current'},
-                {
-                    counts: currentInventory.counts,
-                    date: new Date('January 1, 2048'),
-                    description: 'calculated inventory'
-                },
-                { upsert: true, new: true });
+            if(currentInventory){
+                return Inventory.findOneAndUpdate(
+                    { kind: 'current'},
+                    {
+                        counts: currentInventory.counts,
+                        date: new Date('January 1, 2048'),
+                        description: 'calculated inventory'
+                    },
+                    { upsert: true, new: true });
+            }
         })
         .then(() => {
-            // console.dir(currentInv);
             return currentInv;
         })
-    // .catch(err => {
-    //     console.log('Error... ' + err);
-    // });
+        .catch(err => {
+            console.log(`Error updating inventory | ${moment().format(dateFormat)}`);
+            console.log(err);
+        });
 }
 
 function transformInventory(startItem, accuItems){

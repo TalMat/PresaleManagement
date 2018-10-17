@@ -18,6 +18,7 @@ api.post('/orders/print-new',       auth, requireMgmt, orders.printNew);
 api.post('/orders/ship-printed',    auth, requireMgmt, orders.shipPrinted);
 api.post('/orders/invoice-shipped', auth, requireMgmt, orders.invoiceShipped);
 api.post('/order',                                     orders.createOrder);
+api.get('/order/success'            )
 
 
 /*____ inventory ____*/

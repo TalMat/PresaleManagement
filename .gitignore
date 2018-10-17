@@ -1,10 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 server/reports
-server/node_modules
-mgmt_client/node_modules
-cc_client/node_modules
 .idea
 config.json
-backup.bat
 debugging_errors
 processing
+node_modules/
+package-lock.json
+server/app/

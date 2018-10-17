@@ -8,49 +8,37 @@ let passportConfig =    require('./config/passport')(passport);
 let session =           require('express-session');
 let MongoDBStore =      require('connect-mongodb-session')(session);
 let flash =             require('express-flash');
-let fs =                require('fs');
 let nte =               require('./native-template-engine');
 
-let configPath = path.join(__dirname, '../config.json');
-fs.existsSync(configPath)
-    ? setEnvVarsFromFile(configPath)
-    : console.log(`No config file. Configuring ${__filename} with env vars.`);
+// Populates env vars if config file is present
+let config =            require('./util/env-config');
+config.init('../config.json');
 
-function setEnvVarsFromFile(filepath){
-    let config = JSON.parse(fs.readFileSync(filepath));
-    Object.keys(config).forEach(key => {
-        process.env[key] = config[key];
-    });
-}
+// Prints pipe-separated list of arguments followed by date and time
+global.logTime = require('./util/logging').logTime;
+global.log = console.log;
 
-let MONGO_URL = process.env.MONGO_URL;
-let SESSION_SECRET = process.env.SESSION_SECRET;
+// Prints Node and Application versions
+let displayAppInfo =       require('./util/display-info');
+displayAppInfo();
 
 mongoose.Promise = global.Promise;
-
-app = express();
-
-mongoose.connect(MONGO_URL)
+mongoose.connect(process.env.MONGO_URL)
     .then(() => {
-        console.log('Connected to MongoDB using Mongoose.')
+        logTime('Mongoose connected (server.js)')
     })
     .catch(err => {
-        console.log('Error connecting to MongoDB using Mongoose...');
-        console.log(err);
+        logTime('Error connecting Mongoose (server.js)');
+        log(err);
     });
 
+app = express();
 app.engine('html', nte);
 app.set('views', './views');
 app.set('view engine', 'html');
 
 // JS HTML template
-app.use('/girlscouts', (req, res) => {
-    res.render('order-page', {
-        codeError: 'Redemption code is required',
-        showValidation: false,
-        formClasses: ''
-    })
-});
+app.use('/', require('./form-routes'));
 
 // Putting static before sessions prevents
 // new sessions when serving static resources
@@ -59,16 +47,16 @@ app.use('/app', express.static(path.join(__dirname, 'app')));
 
 app.use(
     session({
-        secret: SESSION_SECRET,
+        secret: process.env.SESSION_SECRET,
         saveUninitialized: true,
         resave: true,
         cookie: {
             maxAge: 1000 * 60 * 30,
             rolling: true
         },
-        store: new MongoDBStore({ uri: MONGO_URL, collection: 'sessions' }, (err) => {
-            err ? console.log('Error, cannot connect to MongoDB to store sessions', err)
-                : console.log('Successfully connected to MongoDB to store sessions');
+        store: new MongoDBStore({ uri: process.env.MONGO_URL, collection: 'sessions' }, (err) => {
+            err ? logTime('Error connecting MongoDB (sessions)')
+                : logTime('MongoDB connected (sessions)');
         })
     })
 );
@@ -86,8 +74,15 @@ app.use('/', require('./routes.js'));
 
 // 404 - catch and forward
 app.use((err, req, res, next) => {
-    console.log(err);
+    logTime('Error: 404 page not found', `Original URL: ${req.originalUrl}`);
+    log(err);
     res.render('404', { error: err });
+});
+
+process.on('uncaughtException', err => {
+    logTime('Error: Uncaught error caused application crash');
+    log(err);
+    throw err;
 });
 
 module.exports = app;

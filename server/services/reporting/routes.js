@@ -7,10 +7,6 @@ let fs =                require('fs');
 let path =              require('path');
 let mongoose =          require('mongoose');
 let moment =            require('moment');
-
-let MONGO_URL = process.env.MONGO_URL;
-
-let dateFormat = 'MM.DD.YY h:mmA';
 let filenameFormat = 'YYYY-MM-DD';
 
 let contentTypes = {
@@ -21,16 +17,12 @@ let contentTypes = {
 let Grid = require('gridfs-stream');
 let GridFS;
 
-mongoose.Promise = global.Promise;
-mongoose.connect(MONGO_URL)
-    .then(() => {
-        console.log('Connected to MongoDB using Mongoose. (reporting/routes)');
+if(mongoose.connection.readyState !== 1){
+    mongoose.connection.once('open', () => {
+        logTime(`Mongoose open (reporting/routes.js)`);
         GridFS = Grid(mongoose.connection.db, mongoose.mongo);
     })
-    .catch(err => {
-        console.log('Error connecting to MongoDB using Mongoose... (reporting/routes)');
-        console.log(err);
-    });
+}
 
 function makeReportMetadata(orders, filename, kind){
     return {
@@ -44,24 +36,42 @@ function makeReportMetadata(orders, filename, kind){
 
 function saveReportFile(orders, filename, reportKind){
 
-    let metadata = makeReportMetadata(orders, filename, reportKind);
+    return new Promise((resolve, reject) => {
 
-    let writeStream = GridFS.createWriteStream({
-        filename: filename.split('.')[0],
-        metadata: metadata
-    });
+        if(orders.length < 1) reject(new Error('Orders array is empty.'));
 
-    writeStream.on('close', file => {
+        let metadata = makeReportMetadata(orders, filename, reportKind);
+
+        let writeStream = GridFS.createWriteStream({
+            filename: filename.split('.')[0],
+            metadata: metadata
+        });
+
+        let readStream = fs.createReadStream(path.join(__dirname, '../../reports', filename))
+            .pipe(writeStream);
+
         // todo - remove file from local storage
-        return Promise.resolve(metadata);
-    });
+        writeStream.on('close', () => {
+            logTime('Report successfully saved', filename, reportKind);
+            resolve(metadata);
+        });
 
-    writeStream.on('error', err => {
-        return Promise.reject(err);
-    });
+        writeStream.on('error', err => {
+            logTime('Error writing report using GridFS', filename, reportKind);
+            console.log(err);
+            reject(err);
+        });
 
-    fs.createReadStream(path.join(__dirname, '../../reports', filename))
-        .pipe(writeStream);
+        readStream.on('error', err => {
+            logTime('Error reading generated report from file system', filename, reportKind);
+            console.log(err);
+            reject(err)
+        });
+
+        writeStream.on('finish', err => {
+            err ? reject(err) : resolve(metadata);
+        });
+    });
 }
 
 function getMapOfCounts(orders){
@@ -89,7 +99,9 @@ exports.newProduction = (orders) => {
     let filename = `production_${moment().format(filenameFormat)}.pdf`;
 
     let metadata = productionReport.generate(filename, orders)
-        .then(filename => saveReportFile(orders, filename, 'production'));
+        .then(filename => {
+            return saveReportFile(orders, filename, 'production');
+        });
 
     let counts = getMapOfCounts(orders);
 
@@ -99,12 +111,17 @@ exports.newProduction = (orders) => {
         counts
     });
 
-    return Promise.all([metadata, inventoryUpdate]).then((reportData) => {
-        return {
-            filename: filename,
-            report: metadata
-        }
-    });
+    return Promise.all([metadata, inventoryUpdate])
+        .then((reportData) => {
+            return {
+                filename: filename,
+                report: metadata
+            }
+        })
+        .catch(err => {
+            logTime('Error creating production report');
+            console.log(err);
+        })
 };
 
 exports.newShipment = (orders) => {
@@ -117,7 +134,11 @@ exports.newShipment = (orders) => {
                 filename: filename,
                 report: metadata
             }
-        });
+        })
+        .catch(err => {
+            logTime('Error creating shipping report');
+            console.log(err);
+        })
 };
 
 exports.newInvoice = (orders) => {
@@ -148,8 +169,9 @@ exports.download = (req, res) => {
             readStream.pipe(res);
         })
         .catch(err => {
+            logTime(`Error downloading report file`, `User: ${req.user.local.username}`);
+            console.log(err);
             res.render('404', {error: err });
-            console.log(`${err} | User: ${req.user.local.username} | ${moment().format(dateFormat)}`);
         });
 
 };
@@ -169,8 +191,9 @@ exports.file = (req, res) => {
             readStream.pipe(res);
         })
         .catch(err => {
+            logTime(`Error downloading report file`, `User: ${req.user.local.username}`);
+            console.log(err);
             res.render('404', {error: err });
-            console.log(`${err} | User: ${req.user.local.username} | ${moment().format(dateFormat)}`);
         });
 };
 
